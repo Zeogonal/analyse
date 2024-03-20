@@ -1,4 +1,3 @@
-
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -31,59 +30,10 @@ public class Main {
         }).start();
 
         Thread.sleep(100);
-        Thread letterA = new Thread(() -> {
-            int amount = 0;
-            int tempAmount;
-            for (int i = 0; i < stringAmount; i++) {
-                try {
-                    String tempString = blockingQueue1.take();
-                    tempAmount = symbolCounting('a', tempString);
-                    if (tempAmount > amount) {
-                        stringMaxA.setMaxAmount(tempAmount);
-                        stringMaxA.setText(tempString);
-                        amount = tempAmount;
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }// for
-        });
+        Thread letterA = foo(stringAmount, blockingQueue1, stringMaxA, 'a');
+        Thread letterB = foo(stringAmount, blockingQueue2, stringMaxB, 'b');
+        Thread letterC = foo(stringAmount, blockingQueue3, stringMaxC, 'c');
 
-        Thread letterB = new Thread(() -> {
-            int amount = 0;
-            int tempAmount;
-            for (int i = 0; i < stringAmount; i++) {
-                try {
-                    String tempString = blockingQueue2.take();
-                    tempAmount = symbolCounting('b', tempString);
-                    if (tempAmount > amount) {
-                        stringMaxB.setMaxAmount(tempAmount);
-                        stringMaxB.setText(tempString);
-                        amount = tempAmount;
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }// for
-        });
-
-        Thread letterC = new Thread(() -> {
-            int amount = 0;
-            int tempAmount;
-            for (int i = 0; i < stringAmount; i++) {
-                try {
-                    String tempString = blockingQueue3.take();
-                    tempAmount = symbolCounting('c', tempString);
-                    if (tempAmount > amount) {
-                        stringMaxC.setMaxAmount(tempAmount);
-                        stringMaxC.setText(tempString);
-                        amount = tempAmount;
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }// for
-        });
         letterA.start();
         letterB.start();
         letterC.start();
@@ -101,6 +51,26 @@ public class Main {
 //        System.out.println("\n" + stringMaxC.getText());
         System.out.println("Строка с наибольшим количеством букв 'c' содержит " + stringMaxC.getMaxAmount() + " букв 'c'.");
     }// main
+
+    private static Thread foo(int stringAmount, BlockingQueue<String> blockingQueue, MyString stringMax, char c) {
+        return new Thread(() -> {
+            int amount = 0;
+            int tempAmount;
+            for (int i = 0; i < stringAmount; i++) {
+                try {
+                    String tempString = blockingQueue.take();
+                    tempAmount = symbolCounting(c, tempString);
+                    if (tempAmount > amount) {
+                        stringMax.setMaxAmount(tempAmount);
+                        stringMax.setText(tempString);
+                        amount = tempAmount;
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
     public static String generateText(String letters, int length) {
         Random random = new Random();
